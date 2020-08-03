@@ -33,6 +33,7 @@ resource "aws_ecs_service" "main" {
   task_definition = "${aws_ecs_task_definition.main.arn}"
   desired_count   = "${var.ecs_desired_instances}"
   iam_role        = "${var.ecs_iam_role_name}"
+  launch_type     = "FARGATE"
 
   load_balancer {
     target_group_arn = "${var.alb_target_group_arn}"
