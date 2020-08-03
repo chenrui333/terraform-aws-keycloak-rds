@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "assume_role" {
 resource "aws_iam_role" "service" {
   for_each = data.aws_iam_policy_document.assume_role
 
-  name               = "${var.flavor}-${each.key}-service-role"
+  name               = "keycloak-service-role"
   assume_role_policy = each.value.json
 }
 
