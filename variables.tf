@@ -13,7 +13,7 @@ variable "docker_image_url" {
 }
 
 variable "ecs_cluster_name" {
-  default = "ecs_cluster"
+  default = "keycloak_cluster"
 }
 
 variable "ecs_log_level" {
