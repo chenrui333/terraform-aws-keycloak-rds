@@ -25,6 +25,8 @@ data "template_file" "task_definition" {
 resource "aws_ecs_task_definition" "main" {
   family                = "${var.ecs_task_family}"
   container_definitions = "${data.template_file.task_definition.rendered}"
+
+  requires_compatibilities = ["FARGATE"]
 }
 
 resource "aws_ecs_service" "main" {
