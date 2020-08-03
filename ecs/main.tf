@@ -11,7 +11,6 @@ data "template_file" "task_definition" {
     log_group_region        = "${var.aws_region}"
     log_group_name          = "${var.app_log_group_name}"
     container_port          = "${var.docker_container_port}"
-    host_port               = "${var.docker_host_port}"
     keycloak_admin_username = "${var.keycloak_admin_username}"
     keycloak_admin_password = "${var.keycloak_admin_password}"
     database_hostname       = "${var.database_hostname}"
