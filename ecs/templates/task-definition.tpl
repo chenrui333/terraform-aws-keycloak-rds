@@ -6,7 +6,7 @@
         "family":"keycloak",
         "portMappings": [
             {
-                "hostPort": ${host_port},
+                "hostPort": ${container_port},
                 "containerPort": ${container_port},
                 "protocol": "tcp"
             }

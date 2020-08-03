@@ -10,17 +10,12 @@ variable "container_name" {
 
 variable "docker_image_url" {
   description = "The URL of the Docker image"
-  default     = "jboss/keycloak:9.0.3"
+  default     = "jboss/keycloak:11.0.0"
 }
 
 variable "docker_container_port" {
   description = "The Docker container port"
   default     = 8080
-}
-
-variable "docker_host_port" {
-  description = "The Docker host port"
-  default     = 0
 }
 
 variable "ecs_cluster_name" {}
