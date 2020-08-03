@@ -22,6 +22,36 @@ data "template_file" "task_definition" {
   }
 }
 
+
+data "aws_iam_policy_document" "assume_role" {
+  for_each = toset([
+    "ecs-tasks.amazonaws.com",
+    "ecs.amazonaws.com",
+  ])
+
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = [each.value]
+    }
+  }
+}
+
+resource "aws_iam_role" "service" {
+  for_each = data.aws_iam_policy_document.assume_role
+
+  name               = "${var.flavor}-${each.key}-service-role"
+  assume_role_policy = each.value.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_service" {
+  role = aws_iam_role.service["ecs.amazonaws.com"].name
+
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+}
+
 resource "aws_ecs_task_definition" "main" {
   family                = "${var.ecs_task_family}"
   container_definitions = "${data.template_file.task_definition.rendered}"
@@ -31,7 +61,7 @@ resource "aws_ecs_task_definition" "main" {
   memory                   = "1024"
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = ""
-  execution_role_arn       = ""
+  execution_role_arn       = aws_iam_role.service.arn
 }
 
 resource "aws_ecs_service" "main" {
