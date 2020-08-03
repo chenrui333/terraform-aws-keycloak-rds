@@ -26,6 +26,9 @@ resource "aws_ecs_task_definition" "main" {
   family                = "${var.ecs_task_family}"
   container_definitions = "${data.template_file.task_definition.rendered}"
 
+  network_mode             = "awsvpc"
+  cpu                      = "512"
+  memory                   = "1024"
   requires_compatibilities = ["FARGATE"]
 }
 
