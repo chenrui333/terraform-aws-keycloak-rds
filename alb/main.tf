@@ -2,6 +2,7 @@ resource "aws_alb_target_group" "main" {
   name     = "${var.alb_target_group_name}"
   port     = "${var.alb_target_port}"
   protocol = "HTTP"
+  target_type = "ip"  # required for "fargate"
   vpc_id   = "${var.vpc_id}"
 }
 
