@@ -14,12 +14,12 @@ variable "autoscaling_min_size" {
 
 variable "autoscaling_max_size" {
   description = "The maximum number of servers in the autoscaling group"
-  default     = "1"
+  default     = "2"
 }
 
 variable "autoscaling_desired_size" {
   description = "The desired number of servers in the autoscaling group"
-  default     = "1"
+  default     = "2"
 }
 
 variable "key_name" {}
