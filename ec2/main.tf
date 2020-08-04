@@ -1,9 +1,9 @@
-data "aws_ami" "stable_coreos" {
+data "aws_ami" "ecs_optimized" {
   most_recent = true
 
   filter {
-    name   = "description"
-    values = ["CoreOS Container Linux stable *"]
+    name   = "name"
+    values = ["amzn-ami-*-amazon-ecs-optimized"]
   }
 
   filter {
@@ -11,21 +11,7 @@ data "aws_ami" "stable_coreos" {
     values = ["x86_64"]
   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["595879546273"]
-}
-
-data "aws_ami" "amazonlinux_ecs_optimized" {
-  most_recent = true
-
-  filter {
-    name    = "name"
-    values  = ["amzn-ami-*-amazon-ecs-optimized*"]
-  }
+  owners = ["amazon"]
 }
 
 resource "aws_autoscaling_group" "app" {
@@ -55,7 +41,7 @@ resource "aws_launch_configuration" "app" {
   ]
 
   key_name                    = "${var.key_name}"
-  image_id                    = "${data.aws_ami.amazonlinux_ecs_optimized.id}"
+  image_id                    = "${data.aws_ami.ecs_optimized.id}"
   instance_type               = "${var.instance_type}"
   iam_instance_profile        = "${var.app_iam_instance_profile_name}"
   user_data                   = "${data.template_file.cloud_config.rendered}"
