@@ -1,7 +1,17 @@
+data "aws_iam_policy" "AmazonEC2ContainerServiceforEC2Role" {
+  arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
 resource "aws_iam_role" "ecs_service" {
   name = "ecs_service_role"
 
   assume_role_policy = "${file("${path.module}/resources/ecs_service_role.json")}"
+}
+
+resource "aws_iam_role_policy_attachment" "ecsInstanceRole_AmazonEC2ContainerServiceforEC2Role" {
+  policy_arn = data.aws_iam_policy.AmazonEC2ContainerServiceforEC2Role.arn
+
+  role = aws_iam_role.ecs_service.name
 }
 
 resource "aws_iam_role_policy" "ecs_service" {
