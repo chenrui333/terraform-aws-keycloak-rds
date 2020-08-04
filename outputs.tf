@@ -13,3 +13,7 @@ output "aws_ami_id" {
 output "aws_autoscaling_group_arn" {
   value = module.ec2.aws_autoscaling_group_arn
 }
+
+output "ecs_iam_role_name" {
+  value = module.iam.ecs_iam_role_name
+}
