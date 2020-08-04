@@ -19,6 +19,15 @@ data "aws_ami" "stable_coreos" {
   owners = ["595879546273"]
 }
 
+data "aws_ami" "amazonlinux_ecs_optimized" {
+  most_recent = true
+
+  filter {
+    name    = "name"
+    values  = ["amzn-ami-*-amazon-ecs-optimized*"]
+  }
+}
+
 resource "aws_autoscaling_group" "app" {
   name                 = "${var.autoscaling_group_name}"
   vpc_zone_identifier  = "${var.vpc_zone_identifier}"
@@ -46,7 +55,7 @@ resource "aws_launch_configuration" "app" {
   ]
 
   key_name                    = "${var.key_name}"
-  image_id                    = "${data.aws_ami.stable_coreos.id}"
+  image_id                    = "${data.aws_ami.amazonlinux_ecs_optimized.id}"
   instance_type               = "${var.instance_type}"
   iam_instance_profile        = "${var.app_iam_instance_profile_name}"
   user_data                   = "${data.template_file.cloud_config.rendered}"

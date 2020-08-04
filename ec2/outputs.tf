@@ -1,5 +1,5 @@
 output "aws_ami_id" {
-  value = data.aws_ami.stable_coreos.id
+  value = data.aws_ami.amazonlinux_ecs_optimized.id
 }
 
 output "aws_autoscaling_group_arn" {
