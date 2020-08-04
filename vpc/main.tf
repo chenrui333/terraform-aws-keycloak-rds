@@ -91,6 +91,16 @@ resource "aws_security_group" "instance_sg" {
 
   ingress {
     protocol  = "tcp"
+    from_port = 8080
+    to_port   = 8080
+
+    cidr_blocks = [
+      "${var.admin_cidr_ingress}",
+    ]
+  }
+
+  ingress {
+    protocol  = "tcp"
     from_port = 32768
     to_port   = 61000
 
