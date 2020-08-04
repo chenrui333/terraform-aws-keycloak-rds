@@ -9,7 +9,7 @@ variable "key_name" {
 }
 
 variable "docker_image_url" {
-  default = "jboss/keycloak:11.0.0"
+  default = "jboss/keycloak:9.0.3"
 }
 
 variable "ecs_cluster_name" {
