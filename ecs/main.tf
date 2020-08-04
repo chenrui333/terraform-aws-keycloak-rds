@@ -2,6 +2,42 @@ resource "aws_ecs_cluster" "main" {
   name = "${var.ecs_cluster_name}"
 }
 
+# ------------------------------------------------------------------------------
+# IAM - Task execution role, needed to pull ECR images etc.
+# ------------------------------------------------------------------------------
+resource "aws_iam_role" "execution" {
+  name               = "${var.ecs_cluster_name}-task-execution-role"
+  assume_role_policy = data.aws_iam_policy_document.task_assume.json
+}
+
+resource "aws_iam_role_policy" "task_execution" {
+  name   = "${var.ecs_cluster_name}-task-execution"
+  role   = aws_iam_role.execution.id
+  policy = data.aws_iam_policy_document.task_execution_permissions.json
+}
+
+# resource "aws_iam_role_policy" "read_repository_credentials" {
+#   count  = length(var.repository_credentials) != 0 ? 1 : 0
+#   name   = "${var.ecs_cluster_name}-read-repository-credentials"
+#   role   = aws_iam_role.execution.id
+#   policy = data.aws_iam_policy_document.read_repository_credentials.json
+# }
+
+# ------------------------------------------------------------------------------
+# IAM - Task role, basic. Users of the module will append policies to this role
+# when they use the module. S3, Dynamo permissions etc etc.
+# ------------------------------------------------------------------------------
+resource "aws_iam_role" "task" {
+  name               = "${var.ecs_cluster_name}-task-role"
+  assume_role_policy = data.aws_iam_policy_document.task_assume.json
+}
+
+resource "aws_iam_role_policy" "log_agent" {
+  name   = "${var.ecs_cluster_name}-log-permissions"
+  role   = aws_iam_role.task.id
+  policy = data.aws_iam_policy_document.task_permissions.json
+}
+
 data "template_file" "task_definition" {
   template = "${file("${path.module}/templates/task-definition.tpl")}"
 
@@ -23,35 +59,6 @@ data "template_file" "task_definition" {
 }
 
 
-data "aws_iam_policy_document" "assume_role" {
-  for_each = toset([
-    "ecs-tasks.amazonaws.com",
-    "ecs.amazonaws.com",
-  ])
-
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type = "Service"
-      identifiers = [each.value]
-    }
-  }
-}
-
-resource "aws_iam_role" "service" {
-  for_each = data.aws_iam_policy_document.assume_role
-
-  name               = "keycloak-service-role"
-  assume_role_policy = each.value.json
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_service" {
-  role = aws_iam_role.service["ecs.amazonaws.com"].name
-
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
-}
-
 resource "aws_ecs_task_definition" "main" {
   family                = "${var.ecs_task_family}"
   container_definitions = "${data.template_file.task_definition.rendered}"
@@ -60,8 +67,8 @@ resource "aws_ecs_task_definition" "main" {
   cpu                      = "512"
   memory                   = "1024"
   requires_compatibilities = ["FARGATE"]
-  task_role_arn            = ""
-  execution_role_arn       = aws_iam_role.service.arn
+  task_role_arn            = aws_iam_role.task.arn
+  execution_role_arn       = aws_iam_role.execution.arn
 }
 
 resource "aws_ecs_service" "main" {
